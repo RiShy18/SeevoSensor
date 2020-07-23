@@ -53,22 +53,22 @@ void loop() {
   
   // Si la distancia del sensor de entrada está en el rango
   // entonces se incrementa el contador
-  if (cm_in < 251){
+  if (cm_in < 250){
     personas_cont++;
-    delay(1000);
+    delay(500);
   }
-  // Si la distancia del sensor de entrada está en el rango
+  // Si la distancia del sensor de salida está en el rango
   // entonces se decrementa el contador
-  if(cm_out < 251){
+  if(cm_out < 250){
     if (personas_cont > 0){
     personas_cont--;
     }
-    delay(1000);
+    delay(500);
   }
   
   // Imprimir la cantidad de personas que hay
   // Corrección de pantalla
-  if (personas_cont == 9 || personas_cont == 99){
+  if ((personas_cont == 9) || (personas_cont == 99)){
     lcd.setCursor(0, 0);
     lcd.clear();
     lcd.print("#Personas ");
@@ -84,9 +84,15 @@ void loop() {
   }
   // Si no está en el valor mayor, la puerta se mantiene
   // abierta
-  if (personas_cont < MAXValue){
+  else if (personas_cont < MAXValue){
     
     servo_6.write(0);
+  }
+  // Si se modifica el maximo con mas personas dentro
+  // la puerta se mantiene cerrada.
+  else if (personas_cont >  MAXValue){
+    
+    servo_6.write(100);
   }
  
   // Detectar si un botón del control se presiona
@@ -108,6 +114,7 @@ void loop() {
      // Ciclo que espera que se presione flecha arriba
      // para setear el nuevo valor maximo.
      while (true){
+       	
         if (irrecv.decode(&results)) {
           read = value_read(results.value);
           
@@ -120,7 +127,7 @@ void loop() {
             break;
           }
           // Mientras no sea la tecla de función
-          else if (read != 10){
+          else if ((read != 10)){
             
             lcd.setCursor(column, 1);
             column++;
